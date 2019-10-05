@@ -8,9 +8,37 @@ namespace DependencyInjectionWorkshop.Models
         bool Verify(string account, string inputPassword, string otp);
     }
 
+    public class FailedCounterDecorator : BaseAuthenticationDecorator
+    {
+        private readonly IFailedCounter _failedCounter;
+
+        public FailedCounterDecorator(IAuthentication authentication, IFailedCounter failedCounter) : base(
+            authentication)
+        {
+            _failedCounter = failedCounter;
+        }
+
+        public override bool Verify(string account, string inputPassword, string otp)
+        {
+            var isValid = base.Verify(account, inputPassword, otp);
+            if (isValid)
+            {
+                ResetFailedCount(account);
+            }
+
+            return isValid;
+        }
+
+        private void ResetFailedCount(string account)
+        {
+            _failedCounter.ResetFailedCount(account);
+        }
+    }
+
     public class AuthenticationService : IAuthentication
     {
         private readonly IFailedCounter _failedCounter;
+        private readonly FailedCounterDecorator _failedCounterDecorator;
         private readonly IHash _hash;
         private readonly ILogger _logger;
         private readonly IOtpService _otpService;
@@ -18,6 +46,7 @@ namespace DependencyInjectionWorkshop.Models
 
         public AuthenticationService()
         {
+            //_failedCounterDecorator = new FailedCounterDecorator(this);
             _profile = new ProfileDao();
             _hash = new Sha256Adapter();
             _otpService = new OtpService();
@@ -28,6 +57,7 @@ namespace DependencyInjectionWorkshop.Models
         public AuthenticationService(IProfile profile, IHash hash, IOtpService otpService, IFailedCounter failedCounter,
             ILogger logger)
         {
+            //_failedCounterDecorator = new FailedCounterDecorator(this);
             _profile = profile;
             _hash = hash;
             _otpService = otpService;
@@ -50,7 +80,7 @@ namespace DependencyInjectionWorkshop.Models
 
             if (passwordFromDb == hashedPassword && otp == currentOtp)
             {
-                _failedCounter.ResetFailedCount(account);
+                //_failedCounterDecorator.ResetFailedCount(account);
 
                 return true;
             }
