@@ -3,38 +3,6 @@ using System.Net.Http;
 
 namespace DependencyInjectionWorkshop.Models
 {
-    public interface IAuthentication
-    {
-        bool Verify(string account, string inputPassword, string otp);
-    }
-
-    public class FailedCounterDecorator : BaseAuthenticationDecorator
-    {
-        private readonly IFailedCounter _failedCounter;
-
-        public FailedCounterDecorator(IAuthentication authentication, IFailedCounter failedCounter) : base(
-            authentication)
-        {
-            _failedCounter = failedCounter;
-        }
-
-        public override bool Verify(string account, string inputPassword, string otp)
-        {
-            var isValid = base.Verify(account, inputPassword, otp);
-            if (isValid)
-            {
-                ResetFailedCount(account);
-            }
-
-            return isValid;
-        }
-
-        private void ResetFailedCount(string account)
-        {
-            _failedCounter.ResetFailedCount(account);
-        }
-    }
-
     public class AuthenticationService : IAuthentication
     {
         private readonly IFailedCounter _failedCounter;
@@ -65,6 +33,11 @@ namespace DependencyInjectionWorkshop.Models
             _logger = logger;
         }
 
+        public IFailedCounter FailedCounter
+        {
+            get { return _failedCounter; }
+        }
+
         public bool Verify(string account, string inputPassword, string otp)
         {
             if (_failedCounter.IsAccountLocked(account))
@@ -86,7 +59,7 @@ namespace DependencyInjectionWorkshop.Models
             }
             else
             {
-                _failedCounter.AddFailedCount(account);
+                //_failedCounterDecorator.AddFailedCount(account, this);
 
                 LogFailedCount(account);
 
