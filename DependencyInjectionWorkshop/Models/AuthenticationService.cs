@@ -9,8 +9,32 @@ using SlackAPI;
 
 namespace DependencyInjectionWorkshop.Models
 {
+    public class ProfileDao
+    {
+        public string GetPasswordFromDb(string account)
+        {
+            string passwordFromDb;
+            using (var connection = new SqlConnection("my connection string"))
+            {
+                var password = connection.Query<string>("spGetUserPassword", new {Id = account},
+                                                        commandType: CommandType.StoredProcedure).SingleOrDefault();
+
+                passwordFromDb = password;
+            }
+
+            return passwordFromDb;
+        }
+    }
+
     public class AuthenticationService
     {
+        private readonly ProfileDao _profileDao;
+
+        public AuthenticationService()
+        {
+            _profileDao = new ProfileDao();
+        }
+
         public bool Verify(string account, string inputPassword, string otp)
         {
             if (GetIsAccountLocked(account))
@@ -18,7 +42,7 @@ namespace DependencyInjectionWorkshop.Models
                 throw new FailedTooManyTimesException();
             }
 
-            var passwordFromDb = GetPasswordFromDb(account);
+            var passwordFromDb = _profileDao.GetPasswordFromDb(account);
 
             var hashedPassword = HashedPassword(inputPassword);
 
@@ -117,20 +141,6 @@ namespace DependencyInjectionWorkshop.Models
 
             var hashedPassword = hash.ToString();
             return hashedPassword;
-        }
-
-        private static string GetPasswordFromDb(string account)
-        {
-            string passwordFromDb;
-            using (var connection = new SqlConnection("my connection string"))
-            {
-                var password = connection.Query<string>("spGetUserPassword", new {Id = account},
-                                                        commandType: CommandType.StoredProcedure).SingleOrDefault();
-
-                passwordFromDb = password;
-            }
-
-            return passwordFromDb;
         }
     }
 
