@@ -4,15 +4,37 @@ using SlackAPI;
 
 namespace DependencyInjectionWorkshop.Models
 {
+    public class OtpService
+    {
+        public OtpService()
+        {
+        }
+
+        public string GetCurrentOtp(string account)
+        {
+            var response = new HttpClient() {BaseAddress = new Uri("http://joey.com/")}
+                           .PostAsJsonAsync("api/otps", account).Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"web api error, accountId:{account}");
+            }
+
+            var currentOtp = response.Content.ReadAsAsync<string>().Result;
+            return currentOtp;
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao;
         private readonly Sah256Adapter _sah256Adapter;
+        private readonly OtpService _otpService;
 
         public AuthenticationService()
         {
             _profileDao = new ProfileDao();
             _sah256Adapter = new Sah256Adapter();
+            _otpService = new OtpService();
         }
 
         public bool Verify(string account, string inputPassword, string otp)
@@ -26,7 +48,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var hashedPassword = _sah256Adapter.ComputeHash(inputPassword);
 
-            var currentOtp = GetCurrentOtp(account);
+            var currentOtp = _otpService.GetCurrentOtp(account);
 
             if (passwordFromDb == hashedPassword && otp == currentOtp)
             {
@@ -51,19 +73,6 @@ namespace DependencyInjectionWorkshop.Models
             var addFailedCountResponse = new HttpClient() {BaseAddress = new Uri("http://joey.com/")}
                                          .PostAsJsonAsync("api/failedCounter/Add", account).Result;
             addFailedCountResponse.EnsureSuccessStatusCode();
-        }
-
-        private static string GetCurrentOtp(string account)
-        {
-            var response = new HttpClient() {BaseAddress = new Uri("http://joey.com/")}
-                           .PostAsJsonAsync("api/otps", account).Result;
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception($"web api error, accountId:{account}");
-            }
-
-            var currentOtp = response.Content.ReadAsAsync<string>().Result;
-            return currentOtp;
         }
 
         private static int GetFailedCount(string account, HttpClient httpClient)
