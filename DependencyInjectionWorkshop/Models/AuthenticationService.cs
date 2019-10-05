@@ -41,7 +41,6 @@ namespace DependencyInjectionWorkshop.Models
         private readonly IFailedCounter _failedCounter;
         private readonly IHash _hash;
         private readonly ILogger _logger;
-        private readonly NotificationDecorator _notificationDecorator;
         private readonly IOtpService _otpService;
         private readonly IProfile _profile;
 
