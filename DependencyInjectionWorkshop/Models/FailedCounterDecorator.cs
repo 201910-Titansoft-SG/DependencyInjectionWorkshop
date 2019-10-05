@@ -12,6 +12,7 @@
 
         public override bool Verify(string account, string inputPassword, string otp)
         {
+            CheckIsAccountLocked(account);
             var isValid = base.Verify(account, inputPassword, otp);
             if (isValid)
             {
@@ -28,6 +29,14 @@
         private void AddFailedCount(string account)
         {
             _failedCounter.AddFailedCount(account);
+        }
+
+        private void CheckIsAccountLocked(string account)
+        {
+            if (_failedCounter.IsAccountLocked(account))
+            {
+                throw new FailedTooManyTimesException();
+            }
         }
 
         private void ResetFailedCount(string account)

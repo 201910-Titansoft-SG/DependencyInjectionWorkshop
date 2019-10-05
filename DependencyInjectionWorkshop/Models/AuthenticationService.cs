@@ -6,7 +6,6 @@ namespace DependencyInjectionWorkshop.Models
     public class AuthenticationService : IAuthentication
     {
         private readonly IFailedCounter _failedCounter;
-        private readonly FailedCounterDecorator _failedCounterDecorator;
         private readonly IHash _hash;
         private readonly ILogger _logger;
         private readonly IOtpService _otpService;
@@ -33,11 +32,6 @@ namespace DependencyInjectionWorkshop.Models
 
         public bool Verify(string account, string inputPassword, string otp)
         {
-            if (_failedCounter.IsAccountLocked(account))
-            {
-                throw new FailedTooManyTimesException();
-            }
-
             var passwordFromDb = _profile.GetPasswordFromDb(account);
 
             var hashedPassword = _hash.ComputeHash(inputPassword);
