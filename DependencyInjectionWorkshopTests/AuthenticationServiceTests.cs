@@ -13,7 +13,7 @@ namespace DependencyInjectionWorkshopTests
         private const string DefaultInputPassword = "abc";
         private const string DefaultOtp = "123456";
         private const int DefaultFailedCount = 91;
-        private AuthenticationService _authenticationService;
+        private IAuthentication _authenticationService;
         private IFailedCounter _failedCounter;
         private IHash _hash;
         private ILogger _logger;
@@ -32,6 +32,8 @@ namespace DependencyInjectionWorkshopTests
             _profile = Substitute.For<IProfile>();
             _authenticationService =
                 new AuthenticationService(_profile, _hash, _otpService, _notification, _failedCounter, _logger);
+
+            _authenticationService = new NotificationDecorator(_authenticationService, _notification);
         }
 
         [Test]
@@ -86,7 +88,7 @@ namespace DependencyInjectionWorkshopTests
         public void log_failed_count_when_invalid()
         {
             GivenFailedCount(DefaultAccount, DefaultFailedCount);
-            WhenInvalid(); 
+            WhenInvalid();
             LogShouldContains(DefaultAccount, DefaultFailedCount);
         }
 
