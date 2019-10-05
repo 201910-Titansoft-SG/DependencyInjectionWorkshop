@@ -26,13 +26,36 @@ namespace DependencyInjectionWorkshop.Models
         }
     }
 
+    public class Sah256Adapter
+    {
+        public Sah256Adapter()
+        {
+        }
+
+        public string ComputeHash(string input)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new StringBuilder();
+            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(input));
+            foreach (var theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+
+            var hashedPassword = hash.ToString();
+            return hashedPassword;
+        }
+    }
+
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao;
+        private readonly Sah256Adapter _sah256Adapter;
 
         public AuthenticationService()
         {
             _profileDao = new ProfileDao();
+            _sah256Adapter = new Sah256Adapter();
         }
 
         public bool Verify(string account, string inputPassword, string otp)
@@ -44,7 +67,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var passwordFromDb = _profileDao.GetPasswordFromDb(account);
 
-            var hashedPassword = HashedPassword(inputPassword);
+            var hashedPassword = _sah256Adapter.ComputeHash(inputPassword);
 
             var currentOtp = GetCurrentOtp(account);
 
@@ -127,20 +150,6 @@ namespace DependencyInjectionWorkshop.Models
 
             var currentOtp = response.Content.ReadAsAsync<string>().Result;
             return currentOtp;
-        }
-
-        private static string HashedPassword(string inputPassword)
-        {
-            var crypt = new System.Security.Cryptography.SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(inputPassword));
-            foreach (var theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2"));
-            }
-
-            var hashedPassword = hash.ToString();
-            return hashedPassword;
         }
     }
 
