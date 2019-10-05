@@ -66,6 +66,18 @@ namespace DependencyInjectionWorkshopTests
             ShouldResetFailedCount(DefaultAccount);
         }
 
+        [Test]
+        public void add_failed_count_when_invalid()
+        {
+            WhenInvalid();
+            ShouldAddFailedCount(DefaultAccount);
+        }
+
+        private void ShouldAddFailedCount(string account)
+        {
+            _failedCounter.Received().AddFailedCount(account);
+        }
+
         private void ShouldResetFailedCount(string account)
         {
             _failedCounter.Received(1).ResetFailedCount(account);
