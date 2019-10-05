@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\AuthenticationService.cs" />
+    <Compile Include="Models\FailedCounter.cs" />
     <Compile Include="Models\OtpService.cs" />
     <Compile Include="Models\ProfileDao.cs" />
     <Compile Include="Models\Sah256Adapter.cs" />
