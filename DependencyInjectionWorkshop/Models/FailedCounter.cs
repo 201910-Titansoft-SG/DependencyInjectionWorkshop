@@ -7,7 +7,7 @@ namespace DependencyInjectionWorkshop.Models
     {
         void ResetFailedCount(string account);
         void AddFailedCount(string account);
-        int GetFailedCount(string account, HttpClient httpClient);
+        int GetFailedCount(string account);
         bool IsAccountLocked(string account);
     }
 
@@ -31,10 +31,11 @@ namespace DependencyInjectionWorkshop.Models
             addFailedCountResponse.EnsureSuccessStatusCode();
         }
 
-        public int GetFailedCount(string account, HttpClient httpClient)
+        public int GetFailedCount(string account)
         {
             var failedCountResponse =
-                httpClient.PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
+                new HttpClient() {BaseAddress = new Uri("http://joey.com/")}
+                    .PostAsJsonAsync("api/failedCounter/GetFailedCount", account).Result;
 
             failedCountResponse.EnsureSuccessStatusCode();
 

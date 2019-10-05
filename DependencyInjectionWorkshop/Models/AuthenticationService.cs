@@ -67,7 +67,7 @@ namespace DependencyInjectionWorkshop.Models
         private void LogFailedCount(string account)
         {
             var failedCount =
-                _failedCounter.GetFailedCount(account, new HttpClient() {BaseAddress = new Uri("http://joey.com/")});
+                _failedCounter.GetFailedCount(account);
 
             _logger.LogInfo(account, failedCount);
         }
