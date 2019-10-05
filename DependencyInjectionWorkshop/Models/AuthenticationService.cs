@@ -14,7 +14,6 @@ namespace DependencyInjectionWorkshop.Models
 
         public AuthenticationService()
         {
-            //_failedCounterDecorator = new FailedCounterDecorator(this);
             _profile = new ProfileDao();
             _hash = new Sha256Adapter();
             _otpService = new OtpService();
@@ -25,17 +24,11 @@ namespace DependencyInjectionWorkshop.Models
         public AuthenticationService(IProfile profile, IHash hash, IOtpService otpService, IFailedCounter failedCounter,
             ILogger logger)
         {
-            //_failedCounterDecorator = new FailedCounterDecorator(this);
             _profile = profile;
             _hash = hash;
             _otpService = otpService;
             _failedCounter = failedCounter;
             _logger = logger;
-        }
-
-        public IFailedCounter FailedCounter
-        {
-            get { return _failedCounter; }
         }
 
         public bool Verify(string account, string inputPassword, string otp)
@@ -53,14 +46,10 @@ namespace DependencyInjectionWorkshop.Models
 
             if (passwordFromDb == hashedPassword && otp == currentOtp)
             {
-                //_failedCounterDecorator.ResetFailedCount(account);
-
                 return true;
             }
             else
             {
-                //_failedCounterDecorator.AddFailedCount(account, this);
-
                 LogFailedCount(account);
 
                 return false;
