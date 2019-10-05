@@ -8,34 +8,6 @@ namespace DependencyInjectionWorkshop.Models
         bool Verify(string account, string inputPassword, string otp);
     }
 
-    public class NotificationDecorator : IAuthentication
-    {
-        private readonly IAuthentication _authenticationService;
-        private readonly INotification _notification;
-
-        public NotificationDecorator(IAuthentication authenticationService, INotification notification)
-        {
-            _authenticationService = authenticationService;
-            _notification = notification;
-        }
-
-        public bool Verify(string account, string inputPassword, string otp)
-        {
-            var isValid = _authenticationService.Verify(account, inputPassword, otp);
-            if (!isValid)
-            {
-                Notify(account);
-            }
-
-            return isValid;
-        }
-
-        private void Notify(string account)
-        {
-            _notification.Notify($"{account}: try to login failed");
-        }
-    }
-
     public class AuthenticationService : IAuthentication
     {
         private readonly IFailedCounter _failedCounter;
