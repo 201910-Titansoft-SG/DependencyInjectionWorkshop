@@ -69,7 +69,7 @@ namespace DependencyInjectionWorkshop.Models
             var failedCount =
                 _failedCounter.GetFailedCount(account);
 
-            _logger.LogInfo(account, failedCount);
+            _logger.LogInfo($"accountId:{account} failed times:{failedCount}");
         }
     }
 

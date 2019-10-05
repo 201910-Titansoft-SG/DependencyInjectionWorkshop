@@ -2,7 +2,7 @@
 {
     public interface ILogger
     {
-        void LogInfo(string account, int failedCount);
+        void LogInfo(string message);
     }
 
     public class NLogAdapter : ILogger
@@ -11,10 +11,10 @@
         {
         }
 
-        public void LogInfo(string account, int failedCount)
+        public void LogInfo(string message)
         {
             var logger = NLog.LogManager.GetCurrentClassLogger();
-            logger.Info($"accountId:{account} failed times:{failedCount}");
+            logger.Info(message);
         }
     }
 }

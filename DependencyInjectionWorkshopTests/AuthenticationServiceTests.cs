@@ -12,6 +12,7 @@ namespace DependencyInjectionWorkshopTests
         private const string DefaultHashedPassword = "my hashed password";
         private const string DefaultInputPassword = "abc";
         private const string DefaultOtp = "123456";
+        private const int DefaultFailedCount = 91;
         private AuthenticationService _authenticationService;
         private IFailedCounter _failedCounter;
         private IHash _hash;
@@ -77,8 +78,27 @@ namespace DependencyInjectionWorkshopTests
         [Test]
         public void account_is_locked()
         {
-            GivenAccountIsLocked(true); 
+            GivenAccountIsLocked(true);
             ShouldThrow<FailedTooManyTimesException>();
+        }
+
+        [Test]
+        public void log_failed_count_when_invalid()
+        {
+            GivenFailedCount(DefaultAccount, DefaultFailedCount);
+            WhenInvalid(); 
+            LogShouldContains(DefaultAccount, DefaultFailedCount);
+        }
+
+        private void LogShouldContains(string account, int failedCount)
+        {
+            _logger.Received(1).LogInfo(
+                Arg.Is<string>(m => m.Contains(account) && m.Contains(failedCount.ToString())));
+        }
+
+        private void GivenFailedCount(string account, int failedCount)
+        {
+            _failedCounter.GetFailedCount(account).Returns(failedCount);
         }
 
         private void ShouldThrow<TException>() where TException : Exception
