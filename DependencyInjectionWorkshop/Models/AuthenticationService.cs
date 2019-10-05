@@ -36,32 +36,23 @@ namespace DependencyInjectionWorkshop.Models
 
     public class AuthenticationService : IAuthentication
     {
-        private readonly IFailedCounter _failedCounter;
         private readonly IHash _hash;
         private readonly LogFailedCountDecorator _logFailedCountDecorator;
-        private readonly ILogger _logger;
         private readonly IOtpService _otpService;
         private readonly IProfile _profile;
 
         public AuthenticationService()
         {
-            //_logFailedCountDecorator = new LogFailedCountDecorator(this);
             _profile = new ProfileDao();
             _hash = new Sha256Adapter();
             _otpService = new OtpService();
-            _failedCounter = new FailedCounter();
-            _logger = new NLogAdapter();
         }
 
-        public AuthenticationService(IProfile profile, IHash hash, IOtpService otpService, IFailedCounter failedCounter,
-            ILogger logger)
+        public AuthenticationService(IProfile profile, IHash hash, IOtpService otpService)
         {
-            //_logFailedCountDecorator = new LogFailedCountDecorator(this);
             _profile = profile;
             _hash = hash;
             _otpService = otpService;
-            _failedCounter = failedCounter;
-            _logger = logger;
         }
 
         public bool Verify(string account, string inputPassword, string otp)
@@ -78,8 +69,6 @@ namespace DependencyInjectionWorkshop.Models
             }
             else
             {
-                //_logFailedCountDecorator.LogFailedCount(account);
-
                 return false;
             }
         }

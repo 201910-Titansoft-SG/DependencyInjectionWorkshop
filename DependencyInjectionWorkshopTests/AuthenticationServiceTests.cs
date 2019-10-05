@@ -31,7 +31,7 @@ namespace DependencyInjectionWorkshopTests
             _hash = Substitute.For<IHash>();
             _profile = Substitute.For<IProfile>();
             _authenticationService =
-                new AuthenticationService(_profile, _hash, _otpService, _failedCounter, _logger);
+                new AuthenticationService(_profile, _hash, _otpService);
 
             _authenticationService = new FailedCounterDecorator(_authenticationService, _failedCounter);
             _authenticationService = new LogFailedCountDecorator(_authenticationService, _logger, _failedCounter);
