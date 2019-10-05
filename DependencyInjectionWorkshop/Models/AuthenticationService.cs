@@ -5,12 +5,12 @@ namespace DependencyInjectionWorkshop.Models
 {
     public class AuthenticationService
     {
-        private readonly ProfileDao _profileDao;
-        private readonly Sha256Adapter _sha256Adapter;
-        private readonly OtpService _otpService;
-        private readonly SlackAdapter _slackAdapter;
-        private readonly FailedCounter _failedCounter;
-        private readonly NLogAdapter _nLogAdapter;
+        private readonly IFailedCounter _failedCounter;
+        private readonly ILogger _nLogAdapter;
+        private readonly IOtpService _otpService;
+        private readonly IProfile _profileDao;
+        private readonly IHash _sha256Adapter;
+        private readonly INotification _slackAdapter;
 
         public AuthenticationService()
         {
@@ -22,7 +22,8 @@ namespace DependencyInjectionWorkshop.Models
             _nLogAdapter = new NLogAdapter();
         }
 
-        public AuthenticationService(ProfileDao profileDao, Sha256Adapter sha256Adapter, OtpService otpService, SlackAdapter slackAdapter, FailedCounter failedCounter, NLogAdapter nLogAdapter)
+        public AuthenticationService(IProfile profileDao, IHash sha256Adapter, IOtpService otpService,
+            INotification slackAdapter, IFailedCounter failedCounter, ILogger nLogAdapter)
         {
             _profileDao = profileDao;
             _sha256Adapter = sha256Adapter;
@@ -66,7 +67,7 @@ namespace DependencyInjectionWorkshop.Models
         private void LogFailedCount(string account)
         {
             var failedCount =
-                _failedCounter.GetFailedCount(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
+                _failedCounter.GetFailedCount(account, new HttpClient() {BaseAddress = new Uri("http://joey.com/")});
 
             _nLogAdapter.LogInfo(account, failedCount);
         }
