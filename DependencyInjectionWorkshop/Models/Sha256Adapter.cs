@@ -2,9 +2,9 @@
 
 namespace DependencyInjectionWorkshop.Models
 {
-    public class Sah256Adapter
+    public class Sha256Adapter
     {
-        public Sah256Adapter()
+        public Sha256Adapter()
         {
         }
 

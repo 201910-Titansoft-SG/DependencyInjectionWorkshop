@@ -6,18 +6,20 @@ namespace DependencyInjectionWorkshop.Models
     public class AuthenticationService
     {
         private readonly ProfileDao _profileDao;
-        private readonly Sah256Adapter _sah256Adapter;
+        private readonly Sha256Adapter _sha256Adapter;
         private readonly OtpService _otpService;
         private readonly SlackAdapter _slackAdapter;
         private readonly FailedCounter _failedCounter;
+        private readonly NLogAdapter _nLogAdapter;
 
         public AuthenticationService()
         {
             _profileDao = new ProfileDao();
-            _sah256Adapter = new Sah256Adapter();
+            _sha256Adapter = new Sha256Adapter();
             _otpService = new OtpService();
             _slackAdapter = new SlackAdapter();
             _failedCounter = new FailedCounter();
+            _nLogAdapter = new NLogAdapter();
         }
 
         public bool Verify(string account, string inputPassword, string otp)
@@ -29,7 +31,7 @@ namespace DependencyInjectionWorkshop.Models
 
             var passwordFromDb = _profileDao.GetPasswordFromDb(account);
 
-            var hashedPassword = _sah256Adapter.ComputeHash(inputPassword);
+            var hashedPassword = _sha256Adapter.ComputeHash(inputPassword);
 
             var currentOtp = _otpService.GetCurrentOtp(account);
 
@@ -54,14 +56,9 @@ namespace DependencyInjectionWorkshop.Models
         private void LogFailedCount(string account)
         {
             var failedCount =
-                _failedCounter.GetFailedCount(account, new HttpClient() {BaseAddress = new Uri("http://joey.com/")});
-            LogInfo(account, failedCount);
-        }
+                _failedCounter.GetFailedCount(account, new HttpClient() { BaseAddress = new Uri("http://joey.com/") });
 
-        private static void LogInfo(string account, int failedCount)
-        {
-            var logger = NLog.LogManager.GetCurrentClassLogger();
-            logger.Info($"accountId:{account} failed times:{failedCount}");
+            _nLogAdapter.LogInfo(account, failedCount);
         }
     }
 
