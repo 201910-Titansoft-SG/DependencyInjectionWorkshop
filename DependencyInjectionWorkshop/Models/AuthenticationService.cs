@@ -22,6 +22,16 @@ namespace DependencyInjectionWorkshop.Models
             _nLogAdapter = new NLogAdapter();
         }
 
+        public AuthenticationService(ProfileDao profileDao, Sha256Adapter sha256Adapter, OtpService otpService, SlackAdapter slackAdapter, FailedCounter failedCounter, NLogAdapter nLogAdapter)
+        {
+            _profileDao = profileDao;
+            _sha256Adapter = sha256Adapter;
+            _otpService = otpService;
+            _slackAdapter = slackAdapter;
+            _failedCounter = failedCounter;
+            _nLogAdapter = nLogAdapter;
+        }
+
         public bool Verify(string account, string inputPassword, string otp)
         {
             if (_failedCounter.IsAccountLocked(account))
